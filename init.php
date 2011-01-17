@@ -18,49 +18,44 @@ License:        MIT
 
 /**
  * This is a KST dependent plugin for WordPress
- * Check first to see that the KST plugin (Kitchen Sink HTML5 Base) is loaded
+ *
+ * Set your settings array
+ * Then test to see that the KST plugin (Kitchen Sink HTML5 Base) is loaded ( KST class exists)
  * If not then go ahead and activate and display a HELPFUL message to download 
  * KST everytime they go to the Plugins Page in the WP admin
+ * Otherwise do your thing...
  */
 
 $my_settings = array(
             /* REQUIRED */
-            'theme_name'                => 'Kitchen Sink HTML5 Plugin Pack',                 // Required; friendly name used by all widgets, libraries, and classes; can be different than the registered theme name
-            'prefix'                 => 'kst_plugin_pack_',                       // Required; Prefix for namespacing libraries, classes, widgets
-            'theme_developer'           => 'zoe somebody',                           // Required; friendly name of current developer; only used for admin display;
-            'theme_developer_url'       => 'http://beingzoe.com/',            // Required; full URI to developer website;
+            'friendly_name'       => 'Kitchen Sink HTML5 Plugin Pack',                 // Required; friendly name used by all widgets, libraries, and classes; can be different than the registered theme name
+            'prefix'              => 'kst_plugin_pack_',                       // Required; Prefix for namespacing libraries, classes, widgets
+            'developer'           => 'zoe somebody',                           // Required; friendly name of current developer; only used for admin display;
+            'developer_url'       => 'http://beingzoe.com/',            // Required; full URI to developer website;
         );
  
-switch ( class_exists('KST_KST') ) {
+switch ( class_exists('KST') ) {
     // Your KST Dependent plugin code goes here
     case TRUE:
         add_action('plugins_loaded', 'tell_me_something');
-        /**
-         * Companion plugin init
-         * Define contstants used throughout KST
-         *
-         */
-         global $kst;
-        /**
-         * Various Kitchen Sink HTML5 Base settings
-         */
-        
             
-         /* Invoke the plugin to use it */
-        $kst->init($my_settings);
+        /*
+         * Register your plugin with KST
+         * Then init the features you want to use individually
+         */
+        $my_plugin = KST::new_doodad($my_settings);
         
         function tell_me_something() {
-            global $kst;
-            //echo $kst->{test_companion_0_1}->testme;
+            global $my_plugin;
+            //echo $my_plugin->testme;
         }
     break;
     // Your
     default;
         add_action('admin_notices', 'make_sure'); // Insert notice hook
         function make_sure() { // Outputs some help info and a download link
-            if ( substr( $_SERVER["PHP_SELF"], -11 ) == 'plugins.php' && !class_exists('KST_KST') ) {
-                echo "<div class='updated'><p>The <strong>{$GLOBALS['my_settings']['theme_name']}</strong> plugin requires the KST base plugin.<br /><a href='#'>Download and install KST Base</a></p></div>";
-            //exit('FAILURE');
+            if ( substr( $_SERVER["PHP_SELF"], -11 ) == 'plugins.php' && !class_exists('KST') ) {
+                echo "<div class='error'><p>The <strong>{$GLOBALS['my_settings']['friendly_name']}</strong> plugin requires the KST base plugin.<br /><a href='#'>Download and install KST Base</a></p></div>";
             }
         }
     break;
